@@ -1,0 +1,7 @@
+plugins {
+    id 'java'
+}
+
+group = "com.jsblogs"
+version = "1.0"
+
