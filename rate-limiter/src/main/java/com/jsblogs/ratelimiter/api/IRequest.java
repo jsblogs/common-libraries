@@ -1,8 +1,10 @@
 package com.jsblogs.ratelimiter.api;
 
-public interface IncomingRequest {
+public interface IRequest {
 
     String getPath();
+
+    String httpMethod();
 
     String getUniqueId();
 }
