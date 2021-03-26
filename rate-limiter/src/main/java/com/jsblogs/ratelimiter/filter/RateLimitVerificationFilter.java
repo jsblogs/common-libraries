@@ -33,12 +33,17 @@ public class RateLimitVerificationFilter implements Filter {
             // Perform rate limiting logic here
             IMetadata metadata = rateLimitConfig.getStore().getRateLimitMetaData(req);
             if (metadata.getAllowedApiLimit() > 0) {
-
+                // limit allowed
+                rateLimitConfig.getStore().markVisited(req);
             } else {
-
+                writeRateLimitExpiredMessage(response, metadata);
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private void writeRateLimitExpiredMessage(ServletResponse response, IMetadata metadata) {
+        
     }
 
     @Override
