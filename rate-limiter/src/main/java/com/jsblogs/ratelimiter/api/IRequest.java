@@ -1,10 +1,12 @@
 package com.jsblogs.ratelimiter.api;
 
+import com.jsblogs.ratelimiter.enums.HttpMethod;
+
 public interface IRequest {
 
     String getPath();
 
-    String httpMethod();
+    HttpMethod method();
 
     String getUniqueId();
 }

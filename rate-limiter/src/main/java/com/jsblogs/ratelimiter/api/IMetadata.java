@@ -1,5 +1,7 @@
 package com.jsblogs.ratelimiter.api;
 
+import com.jsblogs.ratelimiter.enums.HttpMethod;
+
 import java.time.Duration;
 
 public interface IMetadata {
@@ -10,9 +12,14 @@ public interface IMetadata {
     String getApiPath();
 
     /**
+     * @return configured HttpMethod
+     */
+    HttpMethod getMethod();
+
+    /**
      * @return Unique id to identify the client
      */
-    String getClient();
+    String getUniqueId();
 
     /**
      * @return allowed rate limit for current path.
