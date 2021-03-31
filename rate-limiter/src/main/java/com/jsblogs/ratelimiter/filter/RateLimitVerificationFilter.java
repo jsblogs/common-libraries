@@ -2,12 +2,19 @@ package com.jsblogs.ratelimiter.filter;
 
 import com.jsblogs.ratelimiter.api.IMetadata;
 import com.jsblogs.ratelimiter.api.IRequest;
+import com.jsblogs.ratelimiter.api.IRequestMatcher;
 import com.jsblogs.ratelimiter.api.internal.HttpRequest;
 import com.jsblogs.ratelimiter.config.RateLimitConfig;
+import com.jsblogs.ratelimiter.utils.ApplicationUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+
+import static com.jsblogs.ratelimiter.utils.Constants.APPLICATION_JSON;
+import static com.jsblogs.ratelimiter.utils.Constants.TOO_MANY_REQUESTS;
 
 /**
  * RateLimit Verification Filter takes care the limit available
@@ -28,10 +35,11 @@ public class RateLimitVerificationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         IRequest req = convertRequest((HttpServletRequest) request);
-        if (rateLimitConfig.getRequestMatcher().matches(req)) {
+        IRequestMatcher.MatchedResult matchedResult = rateLimitConfig.getRequestMatcher().matches(req);
+        if (matchedResult.isMatched()) {
             // Request matches to the RateLimiter
             // Perform rate limiting logic here
-            IMetadata metadata = rateLimitConfig.getStore().getRateLimitMetaData(req);
+            IMetadata metadata = matchedResult.getMatchedMetadata();
             if (metadata.getAllowedApiLimit() > 0) {
                 // limit allowed
                 rateLimitConfig.getStore().markVisited(req);
@@ -42,8 +50,14 @@ public class RateLimitVerificationFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    private void writeRateLimitExpiredMessage(ServletResponse response, IMetadata metadata) {
-        
+    private void writeRateLimitExpiredMessage(ServletResponse resp, IMetadata metadata) throws IOException {
+        HttpServletResponse response = (HttpServletResponse) resp;
+        PrintWriter writer = response.getWriter();
+        response.setContentType(APPLICATION_JSON);
+        response.setStatus(TOO_MANY_REQUESTS);
+        writer.write(ApplicationUtils.getErrorResponse(
+                String.format("Rate limit exceeded. Next window in %s seconds.", metadata.getRemainingTime())
+        ));
     }
 
     @Override

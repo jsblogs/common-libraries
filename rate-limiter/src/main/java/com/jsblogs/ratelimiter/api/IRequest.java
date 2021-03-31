@@ -6,7 +6,7 @@ public interface IRequest {
 
     String getPath();
 
-    HttpMethod method();
+    HttpMethod getMethod();
 
     String getUniqueId();
 }

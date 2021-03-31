@@ -5,6 +5,9 @@ import com.jsblogs.ratelimiter.api.IRequestMatcher;
 import com.jsblogs.ratelimiter.api.IStore;
 import com.jsblogs.ratelimiter.api.IUniqueIdFetcher;
 import com.jsblogs.ratelimiter.api.internal.RateLimiterFactory;
+import com.jsblogs.ratelimiter.utils.ApplicationUtils;
+
+import static com.jsblogs.ratelimiter.utils.ApplicationUtils.urlMatch;
 
 public final class RateLimitConfig {
     private final IStore store;
@@ -43,11 +46,16 @@ public final class RateLimitConfig {
             this.store = RateLimiterFactory.createInMemoryStore();
             this.idFetcher = req -> req.getHeader("client-id");
             this.requestMatcher = req -> {
-                IMetadata metadata = store.getRateLimitMetaData(req);
-                if(metadata != null) {
-                    // todo: check here!!!!
+                IMetadata[] metadata = store.getAllConfiguredApis();
+                IRequestMatcher.MatchedResult matchedMetadata = IRequestMatcher.UNMATCHED_REQUEST;
+                for (IMetadata m : metadata) {
+                    if (urlMatch(m.getApiPath(), req.getPath())
+                            && m.getMethod().equals(req.getMethod())) {
+                        matchedMetadata = new IRequestMatcher.MatchedResult(m);
+                        break;
+                    }
                 }
-                return false;
+                return matchedMetadata;
             };
         }
 

@@ -23,7 +23,7 @@ public class HttpRequest implements IRequest {
     }
 
     @Override
-    public HttpMethod method() {
+    public HttpMethod getMethod() {
         return method;
     }
 

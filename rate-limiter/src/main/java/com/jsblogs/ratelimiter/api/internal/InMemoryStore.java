@@ -7,7 +7,12 @@ import com.jsblogs.ratelimiter.api.IStore;
 class InMemoryStore implements IStore {
 
     @Override
-    public IMetadata getRateLimitMetaData(IRequest request) {
+    public IMetadata[] getAllConfiguredApis() {
+        return new IMetadata[0];
+    }
+
+    @Override
+    public IMetadata getRemainingRateLimit(IRequest request) {
         return null;
     }
 

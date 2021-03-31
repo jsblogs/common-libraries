@@ -4,6 +4,10 @@ import com.jsblogs.ratelimiter.enums.HttpMethod;
 
 import java.time.Duration;
 
+/**
+ * Metadata configured by consumers. e.g.
+ * /v1/users/* -> 100 API calls/minute
+ */
 public interface IMetadata {
 
     /**
